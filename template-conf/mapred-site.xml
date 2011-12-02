@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+<!-- set by cloud-init -->
+  <property>
+    <name>mapred.job.tracker</name>
+    <value>set by cloud-init</value>
+  </property>
+  <property>
+    <name>mapred.job.tracker.http.address</name>
+    <value>set by cloud-init</value>
+  </property>
+  <property>
+    <name>mapred.local.dir</name>
+    <value>set by cloud-init</value>
+  </property>
+  <property>
+    <name>mapred.system.dir</name>
+    <value>set by cloud-init</value>
+  </property>
+  <property>
+    <name>mapred.temp.dir</name>
+    <value>set by cloud-init</value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.map.tasks.maximum</name>
+    <value>set by cloud init</value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.reduce.tasks.maximum</name>
+    <value>set by cloud init</value>
+  </property>
+  <property>
+    <name>mapred.child.java.opts</name>
+    <value>set by cloud init</value>
+  </property>
+  <property>
+    <name>mapred.submit.replication</name>
+    <value>set by cloud init</value>
+  </property>
+<!-- ******************************* -->
+  <property>
+    <name>mapred.child.ulimit</name>
+    <value>6000000</value>
+  </property>
+
+</configuration>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!-- Put site-specific property overrides in this file. -->
+<configuration>
+  <!-- These Will be set by Cloud-Init -->
+  <property>
+    <name>fs.default.name</name>
+    <value>set by cloud init</value>
+  </property>
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>set by cloud init</value>
+  </property>
+  <!-- ******************************* -->
+  <property>
+    <name>webinterface.private.actions</name>
+    <value>1</value>
+  </property>
+</configuration>
