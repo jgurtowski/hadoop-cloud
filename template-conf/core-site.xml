@@ -5,15 +5,10 @@
   <!-- These Will be set by Cloud-Init -->
   <property>
     <name>fs.default.name</name>
-    <value>set by cloud init</value>
+    <value>hdfs://10.0.8.7:8020/</value>
   </property>
   <property>
     <name>hadoop.tmp.dir</name>
-    <value>set by cloud init</value>
-  </property>
-  <!-- ******************************* -->
-  <property>
-    <name>webinterface.private.actions</name>
-    <value>1</value>
+    <value>/tmp/hadoop</value>
   </property>
 </configuration>

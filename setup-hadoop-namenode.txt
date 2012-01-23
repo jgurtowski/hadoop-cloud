@@ -1,0 +1,10 @@
+
+cd $HADOOP_HOME
+
+su ubuntu -c "echo 'Y' | bin/hadoop namenode -format"
+su ubuntu -c "bin/hadoop-daemon.sh start namenode"
+echo "making $mapred_system_dir in hdfs"
+su ubuntu -c "bin/hadoop fs -mkdir $mapred_system_dir"
+su ubuntu -c "bin/hadoop-daemon.sh start jobtracker"
+
+echo "Done namenode setup"

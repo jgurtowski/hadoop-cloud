@@ -1,0 +1,50 @@
+#!/bin/bash
+
+HADOOP_HOME=/home/ubuntu/hadoop
+
+localip=`ifconfig | grep -A1 eth0 | grep inet | cut -d: -f2 | cut -d' ' -f1`
+namenode="<-namenode->" 
+if [ $namenode = "localhost" ]; then
+    namenode=$localip
+fi
+jobtracker="<-jobtracker->"
+if [ $jobtracker = "localhost" ]; then
+    jobtracker=$localip
+fi
+cores="<-cores->"
+mem="<-mem->"
+
+dfs_replication="3"
+
+dfs_name_dir="/mnt/hadoop/dfs/name"
+dfs_data_dir="/mnt/hadoop/dfs/data"
+mapred_local_dir="/mnt/hadoop/mapred/local"
+hadoop_tmp_dir="/tmp/hadoop"
+
+
+for i in $dfs_name_dir $dfs_data_dir $mapred_local_dir $hadoop_tmp_dir
+do
+    mkdir -p $i
+    
+done
+
+chown -R ubuntu:ubuntu /mnt/hadoop
+
+#created in hdfs
+mapred_system_dir="/hadoop/mapred/system"
+
+cd ${HADOOP_HOME}/conf
+
+xmlstarlet ed -L -u "//property[name='fs.default.name']/child::value" -v "hdfs://$namenode:8020/" core-site.xml
+xmlstarlet ed -L -u "//property[name='hadoop.tmp.dir']/child::value" -v "$hadoop_tmp_dir" core-site.xml
+
+xmlstarlet ed -L -u "//property[name='dfs.name.dir']/child::value" -v "$dfs_name_dir" hdfs-site.xml
+xmlstarlet ed -L -u "//property[name='dfs.data.dir']/child::value" -v "$dfs_data_dir" hdfs-site.xml
+xmlstarlet ed -L -u "//property[name='dfs.replication']/child::value" -v "$dfs_replication" hdfs-site.xml
+
+xmlstarlet ed -L -u "//property[name='mapred.job.tracker']/child::value" -v "$jobtracker:8021" mapred-site.xml
+xmlstarlet ed -L -u "//property[name='mapred.tasktracker.map.tasks.maximum']/child::value" -v "$cores" mapred-site.xml
+xmlstarlet ed -L -u "//property[name='mapred.tasktracker.reduce.tasks.maximum']/child::value" -v "$cores" mapred-site.xml
+xmlstarlet ed -L -u "//property[name='mapred.local.dir']/child::value" -v "$mapred_local_dir" mapred-site.xml
+xmlstarlet ed -L -u "//property[name='mapred.system.dir']/child::value" -v "$mapred_system_dir" mapred-site.xml
+xmlstarlet ed -L -u "//property[name='mapred.child.java.opts']/child::value" -v "-Xmx${mem}m" mapred-site.xml
