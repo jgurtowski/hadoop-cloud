@@ -1,6 +1,3 @@
 
-cd $HADOOP_HOME
-
-su ubuntu -c "bin/hadoop-daemon.sh start datanode"
-su ubuntu -c "bin/hadoop-daemon.sh start tasktracker"
-
+service hadoop-0.20-datanode start
+service hadoop-0.20-tasktracker start

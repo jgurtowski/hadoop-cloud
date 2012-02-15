@@ -1,50 +1,75 @@
 #!/bin/bash
 
-HADOOP_HOME=/home/ubuntu/hadoop
+HADOOP_CONF="/etc/hadoop/conf"
+
+namenode=""
+
+if [ -z $namenode ]
+then
+ echo "----"
+ echo "set namenode"
+ echo "----"
+ exit;
+fi
+
 
 localip=`ifconfig | grep -A1 eth0 | grep inet | cut -d: -f2 | cut -d' ' -f1`
-namenode="<-namenode->" 
+
 if [ $namenode = "localhost" ]; then
     namenode=$localip
 fi
-jobtracker="<-jobtracker->"
+jobtracker=$namenode
 if [ $jobtracker = "localhost" ]; then
     jobtracker=$localip
 fi
-cores="<-cores->"
-mem="<-mem->"
+cores="8"
+mem="4000"
 
 dfs_replication="3"
+mapred_submit_replication="3"
+
+umount -l /dev/vdb
+mkfs.ext4 /dev/vdb
+mount /dev/vdb /mnt
 
 dfs_name_dir="/mnt/hadoop/dfs/name"
 dfs_data_dir="/mnt/hadoop/dfs/data"
 mapred_local_dir="/mnt/hadoop/mapred/local"
-hadoop_tmp_dir="/tmp/hadoop"
+
+hadoop_tmp_dir="/mnt/hadoop/tmp"
 
 
 for i in $dfs_name_dir $dfs_data_dir $mapred_local_dir $hadoop_tmp_dir
 do
     mkdir -p $i
-    
 done
 
-chown -R ubuntu:ubuntu /mnt/hadoop
+chown -R hdfs:hadoop /mnt/hadoop
+chown -R mapred:hadoop $mapred_local_dir
+chmod 777 $hadoop_tmp_dir
 
 #created in hdfs
 mapred_system_dir="/hadoop/mapred/system"
+mapred_temp_dir="/hadoop/mapred/temp"
+mapreduce_staging_dir="/hadoop/mapred/staging"
 
-cd ${HADOOP_HOME}/conf
+cd ${HADOOP_CONF}
 
-xmlstarlet ed -L -u "//property[name='fs.default.name']/child::value" -v "hdfs://$namenode:8020/" core-site.xml
-xmlstarlet ed -L -u "//property[name='hadoop.tmp.dir']/child::value" -v "$hadoop_tmp_dir" core-site.xml
+xmlstarlet ed -u "//property[name='fs.default.name']/child::value" -v "hdfs://$namenode:8020/" core-site.xml > t && mv t core-site.xml
+xmlstarlet ed -u "//property[name='hadoop.tmp.dir']/child::value" -v "$hadoop_tmp_dir" core-site.xml > t && mv t core-site.xml
 
-xmlstarlet ed -L -u "//property[name='dfs.name.dir']/child::value" -v "$dfs_name_dir" hdfs-site.xml
-xmlstarlet ed -L -u "//property[name='dfs.data.dir']/child::value" -v "$dfs_data_dir" hdfs-site.xml
-xmlstarlet ed -L -u "//property[name='dfs.replication']/child::value" -v "$dfs_replication" hdfs-site.xml
+xmlstarlet ed -u "//property[name='dfs.name.dir']/child::value" -v "$dfs_name_dir" hdfs-site.xml > t && mv t hdfs-site.xml
+xmlstarlet ed -u "//property[name='dfs.data.dir']/child::value" -v "$dfs_data_dir" hdfs-site.xml > t && mv t hdfs-site.xml
+xmlstarlet ed -u "//property[name='dfs.replication']/child::value" -v "$dfs_replication" hdfs-site.xml > t && mv t hdfs-site.xml
 
-xmlstarlet ed -L -u "//property[name='mapred.job.tracker']/child::value" -v "$jobtracker:8021" mapred-site.xml
-xmlstarlet ed -L -u "//property[name='mapred.tasktracker.map.tasks.maximum']/child::value" -v "$cores" mapred-site.xml
-xmlstarlet ed -L -u "//property[name='mapred.tasktracker.reduce.tasks.maximum']/child::value" -v "$cores" mapred-site.xml
-xmlstarlet ed -L -u "//property[name='mapred.local.dir']/child::value" -v "$mapred_local_dir" mapred-site.xml
-xmlstarlet ed -L -u "//property[name='mapred.system.dir']/child::value" -v "$mapred_system_dir" mapred-site.xml
-xmlstarlet ed -L -u "//property[name='mapred.child.java.opts']/child::value" -v "-Xmx${mem}m" mapred-site.xml
+xmlstarlet ed -u "//property[name='mapred.job.tracker']/child::value" -v "$jobtracker:8021" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.tasktracker.map.tasks.maximum']/child::value" -v "$cores" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.tasktracker.reduce.tasks.maximum']/child::value" -v "$cores" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.local.dir']/child::value" -v "$mapred_local_dir" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.system.dir']/child::value" -v "$mapred_system_dir" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.temp.dir']/child::value" -v "$mapred_temp_dir" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapreduce.jobtracker.staging.root.dir']/child::value" -v "$mapred_staging_dir" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.child.java.opts']/child::value" -v "-Xmx${mem}m" mapred-site.xml > t && mv t mapred-site.xml 
+xmlstarlet ed -u "//property[name='mapred.submit.replication']/child::value" -v "$mapred_submit_replication" mapred-site.xml > t && mv t mapred-site.xml 
+
+echo "Setup Done"

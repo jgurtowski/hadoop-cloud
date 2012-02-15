@@ -84,7 +84,7 @@ def main():
 
     nova = getConnection()
 
-    image = nova.images.get("65") ###hardcode image and flavor
+    image = nova.images.get("90") ###hardcode image and flavor
     flavor = nova.flavors.get("5") #xlarge
 
     node = Script("setup-hadoop.txt")

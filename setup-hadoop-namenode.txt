@@ -1,10 +1,18 @@
 
-cd $HADOOP_HOME
 
-su ubuntu -c "echo 'Y' | bin/hadoop namenode -format"
-su ubuntu -c "bin/hadoop-daemon.sh start namenode"
-echo "making $mapred_system_dir in hdfs"
-su ubuntu -c "bin/hadoop fs -mkdir $mapred_system_dir"
-su ubuntu -c "bin/hadoop-daemon.sh start jobtracker"
+su hdfs -c "echo 'Y' | hadoop namenode -format"
+
+service hadoop-0.20-namenode start
+
+
+su hdfs -c "hadoop fs -mkdir /hadoop/mapred/system"
+su hdfs -c "hadoop fs -chown mapred:hadoop /hadoop/mapred/system"
+su hdfs -c "hadoop fs -mkdir /hadoop/mapred/temp"
+su hdfs -c "hadoop fs -chmod -R 1777 /hadoop/mapred/temp"
+su hdfs -c "hadoop fs -mkdir /hadoop/mapred/staging"
+su hdfs -c "hadoop fs -chmod -R 1777 /hadoop/mapred/staging"
+
+service hadoop-0.20-jobtracker start
+
 
 echo "Done namenode setup"
